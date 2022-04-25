@@ -96,19 +96,19 @@ RCT_EXPORT_MODULE();
 
         audioCallConfig = [[RTCAudioSessionConfiguration alloc] init];
         audioCallConfig.category = AVAudioSessionCategoryPlayAndRecord;
-        audioCallConfig.categoryOptions = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDefaultToSpeaker;
-        audioCallConfig.mode = AVAudioSessionModeVoiceChat;
+        audioCallConfig.categoryOptions = 0;
+        audioCallConfig.mode = AVAudioSessionModeDefault;
 
         videoCallConfig = [[RTCAudioSessionConfiguration alloc] init];
         videoCallConfig.category = AVAudioSessionCategoryPlayAndRecord;
         videoCallConfig.categoryOptions = AVAudioSessionCategoryOptionAllowBluetooth;
-        videoCallConfig.mode = AVAudioSessionModeVideoChat;
+        videoCallConfig.mode = AVAudioSessionModeDefault;
 
         // Manually routing audio to the earpiece doesn't quite work unless one disables BT (weird, I know).
         earpieceConfig = [[RTCAudioSessionConfiguration alloc] init];
         earpieceConfig.category = AVAudioSessionCategoryPlayAndRecord;
         earpieceConfig.categoryOptions = 0;
-        earpieceConfig.mode = AVAudioSessionModeVoiceChat;
+        earpieceConfig.mode = AVAudioSessionModeDefault;
 
         forceSpeaker = NO;
         forceEarpiece = NO;
@@ -171,7 +171,7 @@ RCT_EXPORT_METHOD(setMode:(int)mode
     } else {
         reject(@"setMode", error.localizedDescription, error);
     }
-    
+
     [self notifyDevicesChanged];
 }
 
@@ -181,14 +181,16 @@ RCT_EXPORT_METHOD(setAudioDevice:(NSString *)device
     DDLogInfo(@"[AudioMode] Selected device: %@", device);
     
     RTCAudioSession *session = JitsiAudioSession.rtcAudioSession;
+
+    // RTCAudioSession *session = [RTCAudioSession sharedInstance];
     [session lockForConfiguration];
     BOOL success;
     NSError *error = nil;
-    
+
     // Reset these, as we are about to compute them.
     forceSpeaker = NO;
     forceEarpiece = NO;
-    
+
     // The speaker is special, so test for it first.
     if ([device isEqualToString:kDeviceTypeSpeaker]) {
         forceSpeaker = YES;
@@ -211,7 +213,7 @@ RCT_EXPORT_METHOD(setAudioDevice:(NSString *)device
             if (isSpeakerOn) {
                 [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:nil];
             }
-            
+
             // Special case for the earpiece.
             if ([port.portType isEqualToString:AVAudioSessionPortBuiltInMic]) {
                 forceEarpiece = YES;
@@ -229,9 +231,9 @@ RCT_EXPORT_METHOD(setAudioDevice:(NSString *)device
             error = RCTErrorWithMessage(@"Could not find audio device");
         }
     }
-    
+
     [session unlockForConfiguration];
-    
+
     if (success) {
         resolve(nil);
     } else {
@@ -340,7 +342,7 @@ RCT_EXPORT_METHOD(updateDeviceList) {
         AVAudioSession *session = [AVAudioSession sharedInstance];
         NSString *currentPort = @"";
         AVAudioSessionRouteDescription *currentRoute = session.currentRoute;
-        
+
         // Check what the current device is. Because the speaker is somewhat special, we need to
         // check for it first.
         if (currentRoute != nil) {
@@ -355,7 +357,7 @@ RCT_EXPORT_METHOD(updateDeviceList) {
                 self->isEarpieceOn = [input.portType isEqualToString:AVAudioSessionPortBuiltInMic];
             }
         }
-        
+
         BOOL headphonesAvailable = NO;
         for (AVAudioSessionPortDescription *portDesc in session.availableInputs) {
             if ([portDesc.portType isEqualToString:AVAudioSessionPortHeadsetMic] || [portDesc.portType isEqualToString:AVAudioSessionPortHeadphones]) {
@@ -387,7 +389,7 @@ RCT_EXPORT_METHOD(updateDeviceList) {
                @"uid": kDeviceTypeSpeaker,
                @"selected": [NSNumber numberWithBool:[kDeviceTypeSpeaker isEqualToString:currentPort]]
         }];
-        
+
         [self sendEventWithName:kDevicesChanged body:data];
     });
 }
