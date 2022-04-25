@@ -22,13 +22,16 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactApplicationContext;
+//import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.jscexecutor.JSCExecutorFactory;
+//import com.facebook.react.devsupport.DevInternalSettings;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ViewManager;
 import com.oney.WebRTCModule.RTCVideoViewManager;
@@ -267,6 +270,43 @@ class ReactInstanceManagerHolder {
         }
 
         Log.d(ReactInstanceManagerHolder.class.getCanonicalName(), "initializing RN with Activity");
+        SoLoader.init(activity, /* native exopackage */ false);
+
+        List<ReactPackage> packages
+            = new ArrayList<>(Arrays.asList(
+                new com.calendarevents.CalendarEventsPackage(),
+                new com.corbt.keepawake.KCKeepAwakePackage(),
+                new com.facebook.react.shell.MainReactPackage(),
+                new com.horcrux.svg.SvgPackage(),
+                new com.kevinresol.react_native_default_preference.RNDefaultPreferencePackage(),
+                new com.learnium.RNDeviceInfo.RNDeviceInfo(),
+                new com.ocetnik.timer.BackgroundTimerPackage(),
+                new com.reactnativecommunity.asyncstorage.AsyncStoragePackage(),
+                new com.reactnativecommunity.netinfo.NetInfoPackage(),
+                new com.reactnativecommunity.webview.RNCWebViewPackage(),
+                new com.rnimmersive.RNImmersivePackage(),
+                new com.zmxv.RNSound.RNSoundPackage(),
+                new ReactPackageAdapter() {
+                    @Override
+                    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+                        return ReactInstanceManagerHolder.createNativeModules(reactContext);
+                    }
+                    @Override
+                    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+                        return ReactInstanceManagerHolder.createViewManagers(reactContext);
+                    }
+                }));
+
+        try {
+            Class<?> googlePackageClass = Class.forName("co.apptailor.googlesignin.RNGoogleSigninPackage");
+            Constructor constructor = googlePackageClass.getConstructor();
+            packages.add((ReactPackage)constructor.newInstance());
+        } catch (Exception e) {
+            // Ignore any error, the module is not compiled when LIBRE_BUILD is enabled.
+        }
+
+        // Use the Hermes JavaScript engine.
+        HermesExecutorFactory jsFactory = new HermesExecutorFactory();
 
         reactInstanceManager
             = ReactInstanceManager.builder()
@@ -279,5 +319,15 @@ class ReactInstanceManagerHolder {
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
+
+        // Disable delta updates on Android, they have caused trouble.
+//        DevInternalSettings devSettings
+//            = (DevInternalSettings)reactInstanceManager.getDevSupportManager().getDevSettings();
+//        if (devSettings != null) {
+//            devSettings.setBundleDeltasEnabled(false);
+//        }
+
+        // Register our uncaught exception handler.
+        JitsiMeetUncaughtExceptionHandler.register();
     }
 }

@@ -131,6 +131,7 @@ class OverflowMenu extends PureComponent<Props, State> {
             }
         };
 
+        // Remove some options basing on phpFox Business not clearly
         return (
             <BottomSheet
                 onCancel = { this._onCancel }

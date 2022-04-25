@@ -15,7 +15,8 @@ import {
     SET_VIDEO_MUTED,
     SET_VIDEO_UNMUTE_PERMISSIONS,
     STORE_VIDEO_TRANSFORM,
-    TOGGLE_CAMERA_FACING_MODE
+    TOGGLE_CAMERA_FACING_MODE,
+    INVITE_PEOPLE
 } from './actionTypes';
 import {
     MEDIA_TYPE,
@@ -202,5 +203,19 @@ export function storeVideoTransform(streamId: string, transform: Object) {
 export function toggleCameraFacingMode() {
     return {
         type: TOGGLE_CAMERA_FACING_MODE
+    };
+}
+
+/**
+ * Touch to trigger the function inviting others in the call, the processing
+ * will be handled in the mobile app
+ *
+ * @returns {{
+ *     type: INVITE_PEOPLE
+ * }}
+ */
+export function invitePeople() {
+    return {
+        type: INVITE_PEOPLE
     };
 }
