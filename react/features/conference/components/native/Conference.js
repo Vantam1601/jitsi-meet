@@ -352,13 +352,13 @@ class Conference extends AbstractConference<Props, State> {
                         </TintedView>
                 }
 
-                <SafeAreaView
+                {/* <SafeAreaView
                     pointerEvents = 'box-none'
                     style = { styles.navBarSafeView }>
                     <NavigationBar />
                         { this._renderNotificationsContainer() }
                     <KnockingParticipantList />
-                </SafeAreaView>
+                </SafeAreaView> */}
 
                 <View
                     pointerEvents = 'box-none'

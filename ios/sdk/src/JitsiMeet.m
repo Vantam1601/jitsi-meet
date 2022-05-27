@@ -101,9 +101,9 @@
     JitsiMeetConferenceOptions *optionsNew =[JitsiMeetConferenceOptions fromBuilder:^(JitsiMeetConferenceOptionsBuilder *builder) {
         builder.audioOnly = false;
         builder.room = options.room;
-        builder.subject = options.subject;
+        builder.subject = options.featureFlags[@"subject"];
         builder.userInfo = options.userInfo;
-        builder.welcomePageEnabled = NO;
+//        builder.welcomePageEnabled = NO;
         builder.videoMuted = false;
         builder.audioMuted = NO;
 

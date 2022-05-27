@@ -36,7 +36,6 @@
 }
 
 // JitsiMeetViewDelegate
-
 - (void)_onJitsiMeetViewDelegateEvent:(NSString *)name
                              withData:(NSDictionary *)data {
     NSLog(
