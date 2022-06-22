@@ -38,19 +38,17 @@ if [[ $MVN_HTTP == 1 ]]; then
         -DgeneratePom=false \
         -DpomFile=react-native-${RN_VERSION}.pom || true
     popd
-    # Push Hermes
-    echo "Pushing Hermes ${HERMES_VERSION} to the Maven repo"
-    pushd ${THIS_DIR}/../../node_modules/hermes-engine/android/
+    # Push JSC
+    echo "Pushing JSC ${JSC_VERSION} to the Maven repo"
+    pushd ${THIS_DIR}/../../node_modules/jsc-android/dist/org/webkit/android-jsc/${JSC_VERSION}
     mvn \
         deploy:deploy-file \
         -Durl=${MVN_REPO} \
         -DrepositoryId=${MVN_REPO_ID} \
-        -Dfile=hermes-release.aar \
+        -Dfile=android-jsc-${JSC_VERSION}.aar \
         -Dpackaging=aar \
-        -DgroupId=com.facebook \
-        -DartifactId=hermes \
-        -Dversion=${HERMES_VERSION} \
-        -DgeneratePom=true || true
+        -DgeneratePom=false \
+        -DpomFile=android-jsc-${JSC_VERSION}.pom || true
     popd
 else
     # Push React Native, if necessary
@@ -67,19 +65,17 @@ else
         popd
     fi
 
-    # Push Hermes, if necessary
-    if [[ ! -d ${MVN_REPO}/com/facebook/hermes/${HERMES_VERSION} ]]; then
-        echo "Pushing Hermes ${HERMES_VERSION} to the Maven repo"
-        pushd ${THIS_DIR}/../../node_modules/hermes-engine/android/
+    # Push JSC, if necessary
+    if [[ ! -d ${MVN_REPO}/org/webkit/android-jsc/${JSC_VERSION} ]]; then
+        echo "Pushing JSC ${JSC_VERSION} to the Maven repo"
+        pushd ${THIS_DIR}/../../node_modules/jsc-android/dist/org/webkit/android-jsc/${JSC_VERSION}
         mvn \
             deploy:deploy-file \
             -Durl=${MVN_REPO} \
-            -Dfile=hermes-release.aar \
+            -Dfile=android-jsc-${JSC_VERSION}.aar \
             -Dpackaging=aar \
-            -DgroupId=com.facebook \
-            -DartifactId=hermes \
-            -Dversion=${HERMES_VERSION} \
-            -DgeneratePom=true
+            -DgeneratePom=false \
+            -DpomFile=android-jsc-${JSC_VERSION}.pom
         popd
     fi
 
@@ -93,8 +89,8 @@ fi
 # Now build and publish the Jitsi Meet SDK and its dependencies
 echo "Building and publishing the Jitsi Meet SDK"
 pushd ${THIS_DIR}/../
-./gradlew clean
-./gradlew assembleRelease
+./gradlew clean 
+./gradlew assembleRelease 
 ./gradlew publish
 popd
 
