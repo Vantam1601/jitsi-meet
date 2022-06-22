@@ -272,14 +272,6 @@ class Conference extends AbstractConference<Props, *> {
                         </TintedView>
                 }
 
-                <SafeAreaView
-                    pointerEvents = 'box-none'
-                    style = { styles.navBarSafeView }>
-                    <NavigationBar />
-                        { this._renderNotificationsContainer() }
-                    <KnockingParticipantList />
-                </SafeAreaView>
-
                 <View
                     pointerEvents = 'box-none'
                     style = { styles.toolboxAndFilmstripContainer }>
@@ -296,6 +288,13 @@ class Conference extends AbstractConference<Props, *> {
                     { _shouldDisplayTileView ? undefined : <Toolbox /> }
                 </View>
 
+                <SafeAreaView
+                    pointerEvents = 'box-none'
+                    style = { styles.navBarSafeView }>
+                    <NavigationBar />
+                    { this._renderNotificationsContainer() }
+                    <KnockingParticipantList />
+                </SafeAreaView>
 
                 <TestConnectionInfo />
                 { _shouldDisplayTileView ? <Toolbox /> : undefined }
